@@ -35,7 +35,7 @@ def main():
 
         screen.fill((15, 15, 15))
         player.layout.draw(screen) #dibuja los bloque en la caudricula
-        
+        screen.blit(player.previsualization_block.image, player.previsualization_block.rect)
 
         pygame.display.flip()
         clock.tick(FPS)

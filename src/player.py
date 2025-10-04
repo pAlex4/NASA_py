@@ -13,11 +13,12 @@ class Player():
 
         self.grid = set()
         self.camera = Camera()
-        self.previsualization_block = 
+        self.previsualization_block = Previsualization_Block()
 
     def update_player_grid_position(self):
     #Actualiza la posicion del jugador en el grid
         self.gridPosition  =  self.camera.iso_to_grid(self.isoPosition)
+        self.previsualization_block.update_position_block(self.gridPosition, self.camera )
 
     def add_block(self, img):
 
@@ -25,6 +26,7 @@ class Player():
         if self.gridPosition  not in self.grid:
             self.grid.add( self.gridPosition)
             #Crea un bloque y lo agrega al set de Sprites Layout
+            self.previsualization_block.update_block_image(img)
             self.layout.add(Block(self.gridPosition, img), layer= sum(self.gridPosition))
 
     def update_blocks_position(self):
