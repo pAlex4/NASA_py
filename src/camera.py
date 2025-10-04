@@ -10,9 +10,9 @@ class Camera:
        #Varibles que dependen del bloque unitario
         self._anchor = (0, 0)
         #Longitud en pixeles del bloque unitario
-        self._isoWidth = 72
+        self._isoWidth = 80
         #Altura en pixeles del bloque unitario 
-        self._isoHeight = 36
+        self._isoHeight = 53
         self._baseOrigin =  (self._isoWidth//2, 120)
         self._eps = 1e-6
 
@@ -43,7 +43,8 @@ class Camera:
    
         x = ox + self.offset.x + (self._isoWidth//2)*(pos[0] - pos[1]) + ax
         y = oy + self.offset.y + (self._isoHeight //2)*(pos[0] + pos[1]) - pos[2]*self._isoHeight + ay
-        return x, y
+        z = pos[2]
+        return x, y, z
     #Transforma las coordenadas de la vista isometrica a grid cuadrado     
     def iso_to_grid(self, pos):
         ox, oy = self._baseOrigin
@@ -56,4 +57,5 @@ class Camera:
         j_f = 0.5*(v-u)
         i = math.floor(i_f + self._eps)
         j = math.floor(j_f + self._eps)
-        return i, j
+        k = pos[2]
+        return i, j, k
