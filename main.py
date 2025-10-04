@@ -2,9 +2,11 @@ import pygame
 
 pygame.init()
 
+# Screen setup
 screen = pygame.display.set_mode((600, 400))
-pygame.display.set_caption('Top Bar with Dropdown and Cycle Button')
+pygame.display.set_caption('Top Bar with Dropdown, Cycle, and Rotate Buttons')
 
+# Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
@@ -14,6 +16,9 @@ font = pygame.font.SysFont(None, 24)
 
 class TopBarButton:
     def __init__(self, x, y, width, height, text, options=None, cycle=False):
+        """
+        cycle=True means each click cycles through the options instead of showing dropdown.
+        """
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
         self.options = options or []
@@ -27,7 +32,7 @@ class TopBarButton:
     def draw(self, surface):
         pygame.draw.rect(surface, GRAY, self.rect)
         display_text = self.text
-        if self.cycle and self.selected_option:
+        if self.cycle and self.selected_option is not None:
             display_text += f": {self.selected_option}"
         text_surf = font.render(display_text, True, BLACK)
         surface.blit(text_surf, (self.rect.x + 10, self.rect.y + 5))
@@ -44,15 +49,17 @@ class TopBarButton:
                 surface.blit(option_text, (x + 5, y + 5 + i * height))
 
     def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
             if self.rect.collidepoint(event.pos):
                 if self.cycle:
+                    # Cycle through options
                     if self.options:
                         current_index = self.options.index(self.selected_option)
                         next_index = (current_index + 1) % len(self.options)
                         self.selected_option = self.options[next_index]
-                        print(f'Mode changed to: {self.selected_option}')
+                        print(f'{self.text} changed to: {self.selected_option}')
                 else:
+                    # Toggle dropdown visibility
                     self.dropdown_visible = not self.dropdown_visible
                 return True
             elif self.dropdown_visible and not self.cycle:
@@ -62,6 +69,7 @@ class TopBarButton:
                         print(f'Selected: {self.selected_option}')
                         self.dropdown_visible = False
                         return True
+                # Click outside dropdown closes it
                 self.dropdown_visible = False
         return False
 
@@ -82,8 +90,9 @@ class TopBar:
 
 options_button = TopBarButton(10, 5, 100, 30, "Options", ['Option 1', 'Option 2', 'Option 3'])
 mode_button = TopBarButton(120, 5, 150, 30, "Mode", ['draw', 'delete'], cycle=True)
+rotate_button = TopBarButton(280, 5, 150, 30, "Rotate", ['0°', '90°', '180°', '270°'], cycle=True)
 
-top_bar = TopBar(600, 40, [options_button, mode_button])
+top_bar = TopBar(600, 40, [options_button, mode_button, rotate_button])
 
 running = True
 while running:
