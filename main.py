@@ -2,11 +2,9 @@ import pygame
 
 pygame.init()
 
-# Screen setup
 screen = pygame.display.set_mode((600, 400))
-pygame.display.set_caption('Top Bar with Dropdown as Classes')
+pygame.display.set_caption('Top Bar with Dropdown and Cycle Button')
 
-# Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
@@ -15,22 +13,26 @@ DARK_GRAY = (150, 150, 150)
 font = pygame.font.SysFont(None, 24)
 
 class TopBarButton:
-    def __init__(self, x, y, width, height, text, options):
+    def __init__(self, x, y, width, height, text, options=None, cycle=False):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
-        self.options = options
+        self.options = options or []
         self.dropdown_visible = False
         self.dropdown_rects = []
         self.selected_option = None
+        self.cycle = cycle
+        if self.cycle and self.options:
+            self.selected_option = self.options[0]
 
     def draw(self, surface):
-        # Draw button
         pygame.draw.rect(surface, GRAY, self.rect)
-        text_surf = font.render(self.text, True, BLACK)
+        display_text = self.text
+        if self.cycle and self.selected_option:
+            display_text += f": {self.selected_option}"
+        text_surf = font.render(display_text, True, BLACK)
         surface.blit(text_surf, (self.rect.x + 10, self.rect.y + 5))
 
-        # Draw dropdown if visible
-        if self.dropdown_visible:
+        if self.dropdown_visible and not self.cycle:
             self.dropdown_rects = []
             x, y = self.rect.x, self.rect.y + self.rect.height
             width, height = self.rect.width, 30
@@ -42,22 +44,26 @@ class TopBarButton:
                 surface.blit(option_text, (x + 5, y + 5 + i * height))
 
     def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
-                # Toggle dropdown visibility
-                self.dropdown_visible = not self.dropdown_visible
+                if self.cycle:
+                    if self.options:
+                        current_index = self.options.index(self.selected_option)
+                        next_index = (current_index + 1) % len(self.options)
+                        self.selected_option = self.options[next_index]
+                        print(f'Mode changed to: {self.selected_option}')
+                else:
+                    self.dropdown_visible = not self.dropdown_visible
                 return True
-            elif self.dropdown_visible:
+            elif self.dropdown_visible and not self.cycle:
                 for i, rect in enumerate(self.dropdown_rects):
                     if rect.collidepoint(event.pos):
                         self.selected_option = self.options[i]
                         print(f'Selected: {self.selected_option}')
                         self.dropdown_visible = False
                         return True
-                # Clicked outside dropdown
                 self.dropdown_visible = False
         return False
-
 
 class TopBar:
     def __init__(self, width, height, buttons):
@@ -74,9 +80,10 @@ class TopBar:
             if button.handle_event(event):
                 break
 
-# Create top bar with an options button
 options_button = TopBarButton(10, 5, 100, 30, "Options", ['Option 1', 'Option 2', 'Option 3'])
-top_bar = TopBar(600, 40, [options_button])
+mode_button = TopBarButton(120, 5, 150, 30, "Mode", ['draw', 'delete'], cycle=True)
+
+top_bar = TopBar(600, 40, [options_button, mode_button])
 
 running = True
 while running:
