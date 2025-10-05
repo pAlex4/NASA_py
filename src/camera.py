@@ -12,9 +12,10 @@ class Camera:
         #Longitud en pixeles del bloque unitario
         self._isoWidth = 80
         #Altura en pixeles del bloque unitario 
-        self._isoHeight = 53
+        self._isoHeight = 36
         self._baseOrigin =  (self._isoWidth//2, 120)
         self._eps = 1e-6
+        self.z_scale = 1.25
 
     def handle_input(self, events):
         keys = pygame.key.get_pressed()
@@ -36,26 +37,39 @@ class Camera:
                 self.offset += delta     # arrastras la vista
                 self._drag_start = m
 
-    #Transforma las coordenadas del grid cuadrado en vista isometrica      
+  # Transforma coordenadas del grid (i, j, k) a vista isométrica (x, y, z)
     def grid_to_iso(self, pos):
         ox, oy = self._baseOrigin
         ax, ay = self._anchor
-   
-        x = ox + self.offset.x + (self._isoWidth//2)*(pos[0] - pos[1]) + ax
-        y = oy + self.offset.y + (self._isoHeight //2)*(pos[0] + pos[1]) - pos[2]*self._isoHeight + ay
-        z = pos[2]
+
+        # Factor de escala de altura (ajústalo entre 0.25 y 0.6 según se vea mejor)
+ 
+
+        x = ox + self.offset.x + (self._isoWidth // 2) * (pos[0] - pos[1]) + ax
+        y = oy + self.offset.y + (self._isoHeight // 2) * (pos[0] + pos[1]) - pos[2] * self._isoHeight *  self.z_scale  + ay
+        z = pos[2] *  self.z_scale   # opcional, solo si manejas un z 3D adicional (profundidad)
+
         return x, y, z
-    #Transforma las coordenadas de la vista isometrica a grid cuadrado     
+
+
+    # Transforma coordenadas isométricas (x, y, z) de vuelta a grid (i, j, k)
     def iso_to_grid(self, pos):
         ox, oy = self._baseOrigin
         ax, ay = self._anchor
-        X = pos[0] - ox - self.offset.x- ax
+
+
+        X = pos[0] - ox - self.offset.x - ax
         Y = pos[1] - oy - self.offset.y - ay
-        u = X / (self._isoWidth/2)
-        v = Y / (self._isoHeight/2)
-        i_f = 0.5*(u+v)
-        j_f = 0.5*(v-u)
+
+        u = X / (self._isoWidth / 2)
+        v = Y / (self._isoHeight / 2)
+
+        i_f = 0.5 * (u + v)
+        j_f = 0.5 * (v - u)
+
         i = math.floor(i_f + self._eps)
         j = math.floor(j_f + self._eps)
-        k = pos[2]
+        k = math.floor((pos[2] / ( self.z_scale )) + self._eps)
+
         return i, j, k
+
