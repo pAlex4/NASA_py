@@ -10,12 +10,12 @@ class Camera:
        #Varibles que dependen del bloque unitario
         self._anchor = (0, 0)
         #Longitud en pixeles del bloque unitario
-        self._isoWidth = 80
+        self._isoWidth = 64
         #Altura en pixeles del bloque unitario 
-        self._isoHeight = 36
-        self._baseOrigin =  (self._isoWidth//2, 120)
+        self._isoHeight = 32
+        self._baseOrigin =  (0, 0)
         self._eps = 1e-6
-        self.z_scale = 1.25
+        self.z_scale = 1
 
     def handle_input(self, events):
         keys = pygame.key.get_pressed()

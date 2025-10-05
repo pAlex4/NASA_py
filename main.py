@@ -1,58 +1,90 @@
-import pygame 
+import pygame
 from src.player import *
 
-HEIGHT = 800
-WIDTH = 800
-FPS = 60
-
-
-
+# ============================
+# CONFIGURACIÓN INICIAL
+# ============================
+HEIGHT, WIDTH, FPS = 800, 800, 60
 pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-selected_tile = 1
-pygame.display.set_caption("Game")
-TILE_IMG_RAW = pygame.image.load("assets/img/modulo1p1.png").convert_alpha()
-TILE_IMG_RAW_2 = pygame.image.load("assets/img/modulo1p2.png").convert_alpha()
-TILE_IMG = pygame.transform.scale(TILE_IMG_RAW, (80, 80)) 
-TILE_IMG_2 = pygame.transform.scale(TILE_IMG_RAW_2, (80, 80)) 
+pygame.display.set_caption("Mars Habitat Builder")
 
-sel ={1:TILE_IMG,2:TILE_IMG_2}
+# ============================
+# IMÁGENES
+# ============================
+GROUND  = pygame.image.load("assets/img/MarsTiles.png").convert_alpha()
+HABITAT_TILE = pygame.image.load("assets/img/HabitatTile.png").convert_alpha()
+HABITAT_LWALL = pygame.image.load("assets/img/HabitatWallTile.png").convert_alpha()
+HABITAT_RWALL = pygame.image.load("assets/img/HabitatWallRightTile.png").convert_alpha()
+TREADMILL = pygame.image.load("assets/img/TreadMill.png").convert_alpha()
+CHAIR = pygame.image.load("assets/img/chairTile.png").convert_alpha()
+BED = pygame.image.load("assets/img/bedTiles.png").convert_alpha()
+# ============================
+# OBJETOS SELECCIONABLES
+# ============================
+sel = {
+    1: {"img": HABITAT_TILE, "type": "Habitat_Tile"},
+    2: {"img": HABITAT_LWALL, "type": "Habitat_LWall_Tile"},
+    3: {"img": HABITAT_RWALL, "type": "Habitat_RWall_Tile"},
+    4: {"img": TREADMILL, "type": "TreadMill"},
+    5: {"img": CHAIR, "type": "Chair"},
+    6: {"img": BED, "type": "bead"}
+}
+
+# ============================
+# JUGADOR Y ESCENA
+# ============================
 player = Player()
-
+generate_terrain = True
 running = True
-numero = 1
+selected_tile = 1
+selected_key = 0
+
+# ============================
+# BUCLE PRINCIPAL
+# ============================
 while running:
-    mx, my = pygame.mouse.get_pos() #Adqueire la posicion del jugador
-    player.isoPosition = (mx,my,0)
+    mx, my = pygame.mouse.get_pos()
+    player.isoPosition = (mx, my, 0)
     player.update_player_grid_position()
-    events = pygame.event.get() 
+    events = pygame.event.get()
+
+    # Generar el terreno solo una vez
+    if generate_terrain:
+        generate_terrain = False
+        player.generate_terrain(GROUND)
+
+    # --- EVENTOS ---
     for e in events:
         if e.type == pygame.QUIT:
             running = False
+
         elif e.type == pygame.KEYDOWN:
-        # Revisar si es una tecla numérica
+            # Selección numérica
             if pygame.K_0 <= e.key <= pygame.K_9:
                 numero = e.key - pygame.K_0
-                if selected_tile != numero:
+                if numero in sel:
+                    player.selected_object = sel[numero]
                     selected_tile = numero
-                    print(selected_tile)
-        elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1: #Si el jugador presiona click derecho, se agrega bloque
-            
+                    print(f"Tile seleccionado: {selected_tile}")
+            else:
+                selected_key = e.key
+                if player.selected_object:
+                    player.previsualize_action(selected_key)
 
-            player.add_block(sel[numero])
+        elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
+            # Click izquierdo → agregar o quitar
+            player.change_action()
 
-        
+    # --- ACTUALIZACIÓN ---
+    player.camera.handle_input(events)
+    player.update_blocks_position()
 
-    player.camera.handle_input(events) #Actualiza la posicion de la camara
-    player.update_blocks_position() #Actualiza la posicion de los bloques dado la posicion de la camara
-
+    # --- RENDER ---
     screen.fill((15, 15, 15))
-    player.layout.draw(screen) #dibuja los bloque en la caudricula
+    player.layout.draw(screen)
     screen.blit(player.previsualization_block.image, player.previsualization_block.rect)
 
     pygame.display.flip()
     clock.tick(FPS)
-    
-
-
