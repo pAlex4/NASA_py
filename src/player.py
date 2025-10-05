@@ -28,6 +28,10 @@ class Player():
             #Crea un bloque y lo agrega al set de Sprites Layout
             self.previsualization_block.update_block_image(img)
             self.layout.add(Block(self.gridPosition, img), layer= sum(self.gridPosition))
+        else:
+            x,y,z =self.gridPosition
+            z += 1
+            self.layout.add(Block((x,y,z), img), layer= sum(self.gridPosition))
 
     def update_blocks_position(self):
         self.layout.update(self.camera)
