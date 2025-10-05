@@ -18,8 +18,9 @@ HABITAT_TILE = pygame.image.load("assets/img/HabitatTile.png").convert_alpha()
 HABITAT_LWALL = pygame.image.load("assets/img/HabitatWallTile.png").convert_alpha()
 HABITAT_RWALL = pygame.image.load("assets/img/HabitatWallRightTile.png").convert_alpha()
 TREADMILL = pygame.image.load("assets/img/TreadMill.png").convert_alpha()
-CHAIR = pygame.image.load("assets/img/chairTile.png").convert_alpha()
+TABLE = pygame.image.load("assets/img/TableTile.png").convert_alpha()
 BED = pygame.image.load("assets/img/bedTiles.png").convert_alpha()
+WC = pygame.image.load("assets/img/WCTile.png").convert_alpha()
 # ============================
 # OBJETOS SELECCIONABLES
 # ============================
@@ -28,8 +29,10 @@ sel = {
     2: {"img": HABITAT_LWALL, "type": "Habitat_LWall_Tile"},
     3: {"img": HABITAT_RWALL, "type": "Habitat_RWall_Tile"},
     4: {"img": TREADMILL, "type": "TreadMill"},
-    5: {"img": CHAIR, "type": "Chair"},
-    6: {"img": BED, "type": "bead"}
+    5: {"img": TABLE, "type": "Table"},
+    6: {"img": BED, "type": "bead"},
+    7: {"img": WC, "type": "wc"}
+
 }
 
 # ============================
